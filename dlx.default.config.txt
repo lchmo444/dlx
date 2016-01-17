@@ -1,0 +1,3 @@
+[common] 
+floatX = float32
+epsilon = 10e-8
