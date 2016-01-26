@@ -2,3 +2,5 @@ eclipse.preferences.version=1
 encoding//examples/addition_attention.py=utf-8
 encoding//examples/addition_attention_without_encoder.py=utf-8
 encoding//examples/addition_rnn.py=utf-8
+encoding//examples/addition_rnn_load.py=utf-8
+encoding//examples/addition_rnn_save.py=utf-8

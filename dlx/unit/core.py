@@ -115,6 +115,30 @@ class Unit(object):
 
         return self.params, self.regularizers, consts, self.updates
     
+    def get_weights(self):
+        '''Return the weights of the unit, as a list of numpy arrays.'''
+        weights = []
+        for p in self.params:
+            weights.append(K.get_value(p))
+        return weights
+    
+    def set_weights(self, weights):
+        '''Set the weights of the unit.
+
+        weights: a list of numpy arrays. The number of arrays and their shape must match
+            number of the dimensions of the weights of the unit (i.e. it should match the
+            output of `get_weights`).
+        '''
+        assert len(self.params) == len(weights), ('Provided weight array does not match unit weights (' +
+                                                  str(len(self.params)) + ' unit params vs. ' +
+                                                  str(len(weights)) + ' provided weights)')
+        for p, w in zip(self.params, weights):
+            if K.get_value(p).shape != w.shape:
+                raise Exception('Weight shape %s not compatible with weight shape %s.' % (K.get_value(p).shape, w.shape))
+            K.set_value(p, w)
+
+
+    
 class Input(Unit):
     '''A Unit for data input.
     # Output shape
