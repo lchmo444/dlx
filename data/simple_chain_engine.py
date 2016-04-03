@@ -2,22 +2,26 @@ import numpy as np
 
 class SimpleChainEngine(object):
     
-    def __init__(self, chars):
-        self.chars = chars
-        self.cnt = len(chars)
+    def __init__(self, words):
+        self.words = words
+        self.dictionary = ['<EOS>']
+        for s in self.words:
+            self.dictionary.append(s)
+        self.cnt = len(words)
             
     def get_start(self):
         return np.random.randint(self.cnt - 1)
     
     def get_chain(self, start):
-        s = ''
+        chain = [self.words[start]]
         for i in range(start + 1, self.cnt):
-            s += self.chars[i]
-        return s
+            chain.append(self.words[i])
+        chain.append('<EOS>')
+        return chain
             
     def get_data(self):
         start = self.get_start()
-        return self.chars[start], self.get_chain(start)
+        return self.words[start], self.get_chain(start)
     
     def get_dataset(self, size):
         starts = []
@@ -28,8 +32,9 @@ class SimpleChainEngine(object):
             chains.append(a)
         return starts, chains
     
-    def get_character_set(self):
-        return self.chars
+    def get_dictionary(self):
+        return self.dictionary
+    
         
             
 if __name__ == '__main__':
@@ -40,4 +45,4 @@ if __name__ == '__main__':
     for (s, c) in zip(ss, cs):
         print "%s -> %s" %(s,c)
     
-    print engine.get_character_set() 
+    print engine.get_dictionary() 

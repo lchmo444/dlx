@@ -49,6 +49,12 @@ def slice_X(X, start=None, stop=None):
         else:
             return X[start:stop]
         
+def categorical_accuracy(y_true, y_pred):
+    return K.equal(K.argmax(y_true, axis=-1), K.argmax(y_pred, axis=-1))
+
+def binary_accuracy(y_true, y_pred):
+    return K.equal(y_true, K.round(y_pred))
+        
 def standardize_weights(y, sample_weight=None, class_weight=None):
     '''
     '''
@@ -78,6 +84,7 @@ def standardize_l(l):
         return list[l]
     else:
         return [l]
+
 
 def weighted_objective(fn):
     def weighted(y_true, y_pred, weights, mask=None):
@@ -231,7 +238,7 @@ class Model(object):
             y_test = find_output(output_name ,train=False)
             
             if mask_name:
-                mask_train = find_output(mask_name, trian=True)
+                mask_train = find_output(mask_name, train=True)
                 mask_test = find_output(mask_name, train=False)
             else:
                 mask_train = None
@@ -259,14 +266,16 @@ class Model(object):
                 
             if class_mode:
                 self.out_labels.append('acc_'+output_name)
+                
                 if class_mode == "categorical":
-                    train_accuracy = K.mean(K.equal(K.argmax(y, axis=-1),
-                                                    K.argmax(y_train, axis=-1)))
-                    test_accuracy = K.mean(K.equal(K.argmax(y, axis=-1),
-                                               K.argmax(y_test, axis=-1)))
+                    weighted_accuracy = weighted_objective(categorical_accuracy)
+                    train_accuracy = weighted_accuracy(y, y_train, None, mask_train)
+                    test_accuracy = weighted_accuracy(y, y_test, None, mask_test)
+                    
                 elif class_mode == "binary":
-                    train_accuracy = K.mean(K.equal(y, K.round(y_train)))
-                    test_accuracy = K.mean(K.equal(y, K.round(y_test)))
+                    weighted_accuracy = weighted_objective(binary_accuracy)
+                    train_accuracy = weighted_accuracy(y, y_train, None, mask_train)
+                    test_accuracy = weighted_accuracy(y, y_test, None, mask_test)
                 else:
                     raise Exception("Invalid class mode:" + str(class_mode))
                 train_accs.append(train_accuracy)

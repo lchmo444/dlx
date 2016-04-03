@@ -12,11 +12,11 @@ class RNN(Unit):
     '''Fully-connected RNN where the output is to fed back to input.
     # Input shape
         input_single: 2D tensor with shape `(nb_samples, input_dim)`. 
-        input_sequences: 3D tensor with shape `(nb_samples, input_length, input_dim)`.
-        mask: 2D tensor with shape `(nb_samples, input_length)`.
+        input_sequence: 3D tensor with shape `(nb_samples, input_length, input_dim)`.
+        input_mask: 2D tensor with shape `(nb_samples, input_length)`.
 
     # Output shape
-        output_sequences: 3D tensor with shape `(nb_samples, input_length, output_dim)`.
+        output_sequence: 3D tensor with shape `(nb_samples, input_length, output_dim)`.
         output: 2D tensor with shape `(nb_samples, output_dim)`.
     '''
 
@@ -55,7 +55,7 @@ class RNN(Unit):
         return h_t
     
     def step_sequence_with_mask(self, mask_t, x_t, h_tm1, W, U, b):
-        h_t = self.step(x_t, h_tm1, W, U, b)
+        h_t = self.step_sequence(x_t, h_tm1, W, U, b)
         # mask
         h_t = T.switch(mask_t, h_t, 0. * h_t)
         return h_t       
